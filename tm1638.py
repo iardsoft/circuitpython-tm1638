@@ -1,23 +1,27 @@
-# MicroPython TM1638 LED display driver for 8x 7-segment decimal LED modules with 8x individual LEDs and 8x switches
+# CircuitPython TM1638 LED display driver for 8x 7-segment decimal
+# LED modules with 8x individual LEDs and 8x switches
 # 8x push buttons
 
 from micropython import const
-import board
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import Direction, Pull
 import time
 
 TM1638_CMD1 = const(64)  # 0x40 data command
-TM1638_CMD2 = const(192) # 0xC0 address command
-TM1638_CMD3 = const(128) # 0x80 display control command
-TM1638_DSP_ON = const(8) # 0x08 display on
-TM1638_READ = const(2)   # 0x02 read key scan data
+TM1638_CMD2 = const(192)  # 0xC0 address command
+TM1638_CMD3 = const(128)  # 0x80 display control command
+TM1638_DSP_ON = const(8)  # 0x08 display on
+TM1638_READ = const(2)  # 0x02 read key scan data
 TM1638_FIXED = const(4)  # 0x04 fixed address mode
 
 # 0-9, a-z, blank, dash, star
-_SEGMENTS = bytearray(b'\x3F\x06\x5B\x4F\x66\x6D\x7D\x07\x7F\x6F\x77\x7C\x39\x5E\x79\x71\x3D\x76\x06\x1E\x76\x38\x55\x54\x3F\x73\x67\x50\x6D\x78\x3E\x1C\x2A\x76\x6E\x5B\x00\x40\x63')
+_SEGMENTS = bytearray(
+    b"\x3F\x06\x5B\x4F\x66\x6D\x7D\x07\x7F\x6F\x77\x7C\x39\x5E\x79\x71\x3D\x76\x06\x1E\x76\x38\x55\x54\x3F\x73\x67\x50\x6D\x78\x3E\x1C\x2A\x76\x6E\x5B\x00\x40\x63"
+)
+
 
 class TM1638(object):
     """Library for the TM1638 LED display driver."""
+
     def __init__(self, stb, clk, dio, brightness=7):
         self.stb = stb
         self.clk = clk
@@ -29,9 +33,9 @@ class TM1638(object):
 
         self._on = TM1638_DSP_ON
 
-        self.clk.value=1
-        self.dio.value=0
-        self.stb.value=1
+        self.clk.value = 1
+        self.dio.value = 0
+        self.stb.value = 1
 
         self.clear()
         self._write_dsp_ctrl()
@@ -56,7 +60,7 @@ class TM1638(object):
     def _byte(self, b):
         for i in range(8):
             self.clk.value = 0
-            self.dio.value = ((b >> i) & 1)
+            self.dio.value = (b >> i) & 1
             self.clk.value = 1
 
     def _scan_keys(self):
@@ -134,12 +138,10 @@ class TM1638(object):
             raise ValueError("Position out of range")
         self._write_data_cmd()
         for seg in segments:
-            # self.stb(0)
             self.stb.value = 0
             self._set_address(pos << 1)
             self._byte(seg)
             pos += 1
-            # self.stb(1)
             self.stb.value = 1
 
     def keys(self):
@@ -154,17 +156,17 @@ class TM1638(object):
 
     def encode_digit(self, digit):
         """Convert a character 0-9, a-f to a segment."""
-        return _SEGMENTS[digit & 0x0f]
+        return _SEGMENTS[digit & 0x0F]
 
     def encode_string(self, string):
         """Convert an up to 8 character length string containing 0-9, a-z,
         space, dash, star to an array of segments, matching the length of the
         source string excluding dots, which are merged with previous char."""
-        segments = bytearray(len(string.replace('.','')))
+        segments = bytearray(len(string.replace(".", "")))
         j = 0
         for i in range(len(string)):
-            if string[i] == '.' and j > 0:
-                segments[j-1] |= (1 << 7)
+            if string[i] == "." and j > 0:
+                segments[j - 1] |= 1 << 7
                 continue
             segments[j] = self.encode_char(string[i])
             j += 1
@@ -174,32 +176,33 @@ class TM1638(object):
         """Convert a character 0-9, a-z, space, dash or star to a segment."""
         o = ord(char)
         if o == 32:
-            return _SEGMENTS[36] # space
+            return _SEGMENTS[36]  # space
         if o == 42:
-            return _SEGMENTS[38] # star/degrees
+            return _SEGMENTS[38]  # star/degrees
         if o == 45:
-            return _SEGMENTS[37] # dash
+            return _SEGMENTS[37]  # dash
         if o >= 65 and o <= 90:
-            return _SEGMENTS[o-55] # uppercase A-Z
+            return _SEGMENTS[o - 55]  # uppercase A-Z
         if o >= 97 and o <= 122:
-            return _SEGMENTS[o-87] # lowercase a-z
+            return _SEGMENTS[o - 87]  # lowercase a-z
         if o >= 48 and o <= 57:
-            return _SEGMENTS[o-48] # 0-9
-        raise ValueError("Character out of range: {:d} '{:s}'".format(o, chr(o)))
+            return _SEGMENTS[o - 48]  # 0-9
+        raise ValueError(
+            "Character out of range: {:d} '{:s}'".format(o, chr(o)))
 
     def hex(self, val):
         """Display a hex value 0x00000000 through 0xffffffff, right aligned, leading zeros."""
-        string = '{:08x}'.format(val & 0xffffffff)
+        string = "{:08x}".format(val & 0xFFFFFFFF)
         self.segments(self.encode_string(string))
 
     def number(self, num):
         """Display a numeric value -9999999 through 99999999, right aligned."""
         # limit to range -9999999 to 99999999
         num = max(-9999999, min(num, 99999999))
-        string = '{0: >8d}'.format(num)
+        string = "{0: >8d}".format(num)
         self.segments(self.encode_string(string))
 
-    #def float(self, num):
+    # def float(self, num):
     #    # needs more work
     #    string = '{0:>9f}'.format(num)
     #    self.segments(self.encode_string(string[0:9]))
@@ -207,24 +210,24 @@ class TM1638(object):
     def temperature(self, num, pos=0):
         """Displays 2 digit temperature followed by degrees C"""
         if num < -9:
-            self.show('lo', pos) # low
+            self.show("lo", pos)  # low
         elif num > 99:
-            self.show('hi', pos) # high
+            self.show("hi", pos)  # high
         else:
-            string = '{0: >2d}'.format(num)
+            string = "{0: >2d}".format(num)
             self.segments(self.encode_string(string), pos)
-        self.show('*C', pos + 2) # degrees C
+        self.show("*C", pos + 2)  # degrees C
 
     def humidity(self, num, pos=4):
         """Displays 2 digit humidity followed by RH"""
         if num < -9:
-            self.show('lo', pos) # low
+            self.show("lo", pos)  # low
         elif num > 99:
-            self.show('hi', pos) # high
+            self.show("hi", pos)  # high
         else:
-            string = '{0: >2d}'.format(num)
+            string = "{0: >2d}".format(num)
             self.segments(self.encode_string(string), pos)
-        self.show('rh', pos + 2) # relative humidity
+        self.show("rh", pos + 2)  # relative humidity
 
     def show(self, string, pos=0):
         """Displays a string"""
@@ -234,10 +237,11 @@ class TM1638(object):
     def scroll(self, string, delay=250):
         """Display a string, scrolling from the right to left, speed adjustable.
         String starts off-screen right and scrolls until off-screen left."""
-        segments = string if isinstance(string, list) else self.encode_string(string)
+        segments = string if isinstance(
+            string, list) else self.encode_string(string)
         data = [0] * 16
         data[8:0] = list(segments)
         for i in range(len(segments) + 9):
-            self.segments(data[0+i:8+i])
-#            sleep_ms(delay)
+            self.segments(data[0 + i: 8 + i])
+            #            sleep_ms(delay)
             time.sleep(delay / 1000)
