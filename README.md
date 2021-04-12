@@ -78,5 +78,5 @@ Raspberry Pi Pico   | LED&KEY TM1638 Module
 3V3(OUT) - pin 36   | VCC
 GND - pin 28        | GND
 GP21 - pin 27       | STB
-GP19 - pin 26       | CLK
-GP18 - pin 25       | DIO
+GP20 - pin 26       | CLK
+GP19 - pin 25       | DIO
