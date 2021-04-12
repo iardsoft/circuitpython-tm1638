@@ -87,7 +87,7 @@ GP19 - pin 25       | DIO
 
 * [MicroPython TM1638 LED Driver](https://github.com/mcauser/micropython-tm1638)
 * [circuitpython.org](https://circuitpython.org)
-* [TM1638 datasheet](http://titanmec.com/index.php/en/project/download/id/303.html)
+* [Mu editor](https://codewith.mu)
 * [Adafruit CircuitPython](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython)
 
 ## License
