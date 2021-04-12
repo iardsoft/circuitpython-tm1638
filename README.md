@@ -1,9 +1,11 @@
 # circuitpython-tm1638
+
 CircuitPython driver for TM1638 Led &amp; Key modules. Adapted to work on CircuitPython from MicroPython TM1638 LED Driver by mcauser https://github.com/mcauser/micropython-tm1638
 
 Tested on Raspberry Pi Pico with CircuitPython 6.2
 
 ## Usage
+
 Copy the tm1638.py file to the board. Also copy the code below to code.py, using your favorite editor and file manager, or using [Mu editor](https://codewith.mu). The example assumes a TM1638 Led&Key module connected to a Raspberry Pi Pico (see next section)
 
 ```python
@@ -80,3 +82,14 @@ GND - pin 28        | GND
 GP21 - pin 27       | STB
 GP20 - pin 26       | CLK
 GP19 - pin 25       | DIO
+
+## Links
+
+* [MicroPython TM1638 LED Driver](https://github.com/mcauser/micropython-tm1638)
+* [circuitpython.org](https://circuitpython.org)
+* [TM1638 datasheet](http://titanmec.com/index.php/en/project/download/id/303.html)
+* [Adafruit CircuitPython](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython)
+
+## License
+
+Licensed under the [MIT License](http://opensource.org/licenses/MIT).
